@@ -5,7 +5,9 @@
 #include <iostream>
 #include <math.h>
 #include <fstream>
-#include <iomanip>
+
+#define uber
+
 
 double funkcjaFX(double x) {
   return (1 - exp(-x)) / x;
@@ -33,11 +35,12 @@ int main() {
   int pom = 0;
 
   // Plik zawieraja wartosci pobrane ze strony
+  daneWynikowe.open("daneWynikowe.txt");
   danePoprawione.open("danePoprawione.txt");
   plikDane.open("dane.txt");
 
-  std::cout << "|      Argument Funkcji      |      Blad Wzgledny      |      log10(blad)      |"
-               "     ~Blad Wzgledny      |     ~log10(blad)      |\n";
+  std::cout << "|      Argument Funkcji      |     Blad Wzgledny     |    log10(blad)    |"
+               "   ~Blad Wzgledny    |   ~log10(blad)    |\n";
 
   while (!plikDane.eof()) {
 	// Pobranie wartosci z plikow
@@ -45,6 +48,7 @@ int main() {
     plikDane >> argument;
     plikDane >> wartoscPlik;
 
+#ifdef basic
 	// Obliczenie wartosci funkcji oraz oblicznie bledu wzglednego
 	wartoscObliczona = funkcjaFX(argument);
 	blad = abs((wartoscObliczona - wartoscPlik) / wartoscPlik);
@@ -53,15 +57,15 @@ int main() {
 	bladLog = log10(blad);
 
 	// Zapisanie wyniku do pliku
-	daneWynikowe << bladLog << " " << wartoscLog10 << "\n";
+	daneWynikowe << wartoscLog10 << " " << bladLog << "\n";
 
     std::cout << "|          ";
-    //std::cout.width(15);
     std::cout << argument << "         |         ";
     std::cout << blad << "         |         ";
     std::cout << bladLog << "         |         ";
 
-	// Obliczenie wartosci funkcji oraz oblicznie bledu wzglednego
+	// Obliczenie wartosci funkcji oraz oblicznie bledu wzglednego z szeregu taylora
+	// Korzystamy z rozwiniecia w szereg aby uniknac odejmowanie dwoch podbnych liczb
 	wartoscObliczona = funkcjaUlepszona(argument);
 	blad = abs((wartoscObliczona - wartoscPlik) / wartoscPlik);
 
@@ -69,11 +73,26 @@ int main() {
 	bladLog = log10(blad);
 
 	// Zapisanie wyniku do pliku
-	danePoprawione << bladLog << " " << wartoscLog10 << "\n";
+	danePoprawione << wartoscLog10 << " " << bladLog << "\n";
 
     std::cout << blad << "         |         ";
     std::cout << bladLog << "         |\n";
+#endif
 
+#ifdef uber
+	if(wartoscLog10 < -0.5){
+	  wartoscObliczona = funkcjaUlepszona(argument);
+	  blad = abs((wartoscObliczona - wartoscPlik) / wartoscPlik);
+	  bladLog = log10(blad);
+	  danePoprawione << wartoscLog10 << " " << bladLog << "\n";
+	} else {
+	  wartoscObliczona = funkcjaFX(argument);
+	  blad = abs((wartoscObliczona - wartoscPlik) / wartoscPlik);
+	  bladLog = log10(blad);
+	  danePoprawione << wartoscLog10 << " " << bladLog << "\n";
+	}
+
+#endif
   }
 
   daneWynikowe.close();
