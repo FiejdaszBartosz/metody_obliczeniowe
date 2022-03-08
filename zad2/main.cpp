@@ -5,6 +5,7 @@
 #include <iostream>
 #include <math.h>
 #include <fstream>
+#include <iomanip>
 
 double funkcjaFX(double x) {
   return (1 - exp(-x)) / x;
@@ -35,7 +36,8 @@ int main() {
   danePoprawione.open("danePoprawione.txt");
   plikDane.open("dane.txt");
 
-  std::cout << "|      Argument Funkcji      |      Blad Wzgledny      |      log10(blad)      |\n";
+  std::cout << "|      Argument Funkcji      |      Blad Wzgledny      |      log10(blad)      |"
+               "     ~Blad Wzgledny      |     ~log10(blad)      |\n";
 
   while (!plikDane.eof()) {
 	// Pobranie wartosci z plikow
@@ -53,9 +55,11 @@ int main() {
 	// Zapisanie wyniku do pliku
 	daneWynikowe << bladLog << " " << wartoscLog10 << "\n";
 
-	//std::cout << "|         " << argument << "        |            " << blad << "            |            " <<
-	//		  bladLog << "          |\n";
-
+    std::cout << "|          ";
+    //std::cout.width(15);
+    std::cout << argument << "         |         ";
+    std::cout << blad << "         |         ";
+    std::cout << bladLog << "         |         ";
 
 	// Obliczenie wartosci funkcji oraz oblicznie bledu wzglednego
 	wartoscObliczona = funkcjaUlepszona(argument);
@@ -67,8 +71,8 @@ int main() {
 	// Zapisanie wyniku do pliku
 	danePoprawione << bladLog << " " << wartoscLog10 << "\n";
 
-	std::cout << "|         " << argument << "        |            " << blad << "            |            " <<
-			  bladLog << "          |\n";
+    std::cout << blad << "         |         ";
+    std::cout << bladLog << "         |\n";
 
   }
 
