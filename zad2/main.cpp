@@ -6,30 +6,23 @@
 #include <math.h>
 #include <fstream>
 
-double silnia(int i) {
-  if (i > 1)
-	return i * silnia(i - 1);
-  else
-	return 1;
-}
-
 double funkcjaFX(double x) {
   return (1 - exp(-x)) / x;
 }
 
 // funkcje 1 - exp(-x) rozwijamy w szereg Taylora
 double funkcjaUlepszona(double x) {
-  double result = 1;
-  double sign = -1;
-  double step = 1;
+  double wynik = 1;
+  double znak = -1;
+  double krok = 1;
 
   for (int i = 2; i < 20; ++i){
-    step = step * (x / i);
-    result += sign * step;
-    sign = -sign;
+    krok = krok * (x / i);
+    wynik += znak * krok;
+    znak = -znak;
   }
 
-  return result;
+  return wynik;
 }
 
 int main() {
