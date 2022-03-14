@@ -6,7 +6,7 @@
 #include <math.h>
 #include <fstream>
 
-#define uber
+#define basic
 
 
 double funkcjaFX(double x) {

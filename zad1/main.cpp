@@ -2,10 +2,8 @@
 
 int main() {
   int licznikBitowDouble = 0;
-  /**
-   * 1.0 to ostatnia ktora ma 1 w cesze
-   * pomDouble dowolna wartosc wieksza od 1 aby sie wykonal while
-   */
+
+  // pomDouble dowolna wartosc wieksza od 1 aby sie wykonal while
   double precyzjaDouble = 1.0, pomDouble = 1.1;
 
   while(pomDouble > 1.0) {
