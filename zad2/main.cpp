@@ -6,19 +6,21 @@
 #include <math.h>
 #include <fstream>
 
-#define basic
+#define rozszerzona
 
-
+// funkcja z zadania
 double funkcjaFX(double x) {
   return (1 - exp(-x)) / x;
 }
 
 // funkcje 1 - exp(-x) rozwijamy w szereg Taylora
+// zapobiega odejmowaniu podobnych licz co by powodowalo utrate cyfr znaczacych
 double funkcjaUlepszona(double x) {
   double wynik = 1;
   double znak = -1;
   double krok = 1;
 
+  // ograniczenie i wynika z tego ze obliczamy za jego pomoca silnie
   for (int i = 2; i < 20; ++i){
     krok = krok * (x / i);
     wynik += znak * krok;
@@ -48,7 +50,7 @@ int main() {
     plikDane >> argument;
     plikDane >> wartoscPlik;
 
-#ifdef basic
+#ifdef podstawowa
 	// Obliczenie wartosci funkcji oraz oblicznie bledu wzglednego
 	wartoscObliczona = funkcjaFX(argument);
 	blad = abs((wartoscObliczona - wartoscPlik) / wartoscPlik);
@@ -79,7 +81,7 @@ int main() {
     std::cout << bladLog << "         |\n";
 #endif
 
-#ifdef uber
+#ifdef rozszerzona
 	if(wartoscLog10 < -0.5){
 	  wartoscObliczona = funkcjaUlepszona(argument);
 	  blad = abs((wartoscObliczona - wartoscPlik) / wartoscPlik);

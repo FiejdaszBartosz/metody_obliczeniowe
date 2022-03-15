@@ -21,6 +21,8 @@ int main() {
 		licznikBitowDouble++;
   }
   // iloczyn maszynowy = precyzjaDouble * 2
+  // precyzja jest bliska zero wiec jest zdenormalizowana
+  // wiec po wyjsciu z petli trzeba to pomnozyc razy 2
   std::cout << "--------------Double--------------\n";
   std::cout << "Iloczyn maszynowy wynosi: " << 2 * precyzjaDouble << "\n" << "Liczba bitow mantysy: " << licznikBitowDouble;
 
@@ -30,7 +32,6 @@ int main() {
 
   int licznikBitowFloat = 0;
   /**
-   * 1.0 to ostatnia ktora ma 1 w cesze
    * pomDouble dowolna wartosc wieksza od 1 aby sie wykonal while
    */
   float precyzjaFloat = 1.0, pomFloat = 1.1;
