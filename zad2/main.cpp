@@ -6,7 +6,8 @@
 #include <math.h>
 #include <fstream>
 
-#define rozszerzona
+// podstawowa rozszerzona
+#define podstawowa
 
 // funkcja z zadania
 double funkcjaFX(double x) {
