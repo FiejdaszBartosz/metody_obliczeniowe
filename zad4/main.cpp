@@ -145,7 +145,8 @@ void algorytmNewtona(double x, double y, double z) {
     // Wyznaczenie reziduum
     reziduum = max(fabs(wartosciFunkcji[0]), fabs(wartosciFunkcji[1]), fabs(wartosciFunkcji[2]));
 
-    std::cout <<"Iteracja "<< i << "\nx: " << x << "\ny: " << y << "\nz: " << z << "\nestymator: " << estymator << "\nreziduum: " << reziduum << "\n\n";
+    std::cout << "Iteracja "<< i << "\nx: " << x << "\ny: " << y << "\nz: " << z << "\nestymator: " << estymator
+              << "\nreziduum: " << reziduum << "\n\n";
 
 	// Warunki przerwania
 	if ((fabs(reziduum) <= TOLF) || (estymator <= TOLX) || (i >= MAXITERACJE)) {
@@ -160,7 +161,7 @@ void algorytmNewtona(double x, double y, double z) {
 	i++;
   }
 
-  // Dealokacja pamieci 
+  // Dealokacja pamieci
   if(macierz != NULL){
     for (int j = 0; j < 3; ++j)
       delete [] macierz[j];
