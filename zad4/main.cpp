@@ -5,10 +5,31 @@
 #include <iostream>
 #include <math.h>
 
-const double TOLF = 1e-8;
-const double TOLX = 1e-8;
+// Wartosci stale do przerwania metody iteracyjnej
+const double TOLF = 1e-16;
+const double TOLX = 1e-16;
 const int MAXITERACJE = 30;
 
+/**
+ * @brief wybranie max z 3 liczb
+ * @param a 1 liczba do porownania
+ * @param b 2 liczba do porownania
+ * @param c 3 liczba do porownania
+ * @return najwieksza wartosc z trzech podach liczb
+ */
+double max(double a, double b, double c) {
+  double maximum = a;
+
+  if (b > maximum)
+    maximum = b;
+
+  if(c > maximum)
+    maximum = c;
+
+  return maximum;
+}
+
+// Wzory funkcji wziete z zadania 1
 double funkcja1(double x, double y, double z) {
   return x * x + y * y + z * z - 2.0;
 }
@@ -21,6 +42,27 @@ double funkcja3(double x, double y, double z) {
   return x * x - y;
 }
 
+// Obliczenie wektora abc, wzory obliczone wczesniej na kartce
+double obliczA(double x, double y, double z) {
+  return (x * x - y * y - 1.0 + 2.0 * x * x * y) / (2.0 * x * (1.0 + 2.0 * y));
+}
+
+double obliczB(double x, double y, double z) {
+  return (y * y + y - 1.0) / (1.0 + 2.0 * y);
+}
+
+double obliczC(double x, double y, double z) {
+  return (z * z + 2.0 * z * z * y - 2.0 * y - 1.0) / (2.0 * z * (1.0 + 2.0 * y));
+}
+
+/**
+ * @brief Sprawdzenie czy podane wartosci naleza do dziedziny funkcji
+ * @param x
+ * @param y
+ * @param z
+ * @return true - jesli podane punkty naleza do dziedziny funkcji
+ * @return false - jesli podane punkty nie naleza do dziedziny funkcji
+ */
 bool sprawdzZmienne(double x, double y, double z) {
   if (x == 0) {
 	std::cout << "Nieprawidlowy x\n";
@@ -62,7 +104,12 @@ double **uzupelnijJakobian(double x, double y, double z) {
   return temp;
 }
 
-void algorytmNewtona(double x, double y, double z, double **macierz) {
+/**
+ * @brief Funkcja realizujaca uogolnioną metodę Newtona rozwiązywania układu trzech algebraicznych rownań nieliniowych
+ * @param x, y, z - wartosci poczatkowe
+ */
+void algorytmNewtona(double x, double y, double z) {
+  double **macierz = NULL;
   double estymator = 0.0, reziduum = 0.0, wartosciFunkcji[3], wektorABC[3];
   int i = 1;
   bool kontynuuj = true;
@@ -82,11 +129,49 @@ void algorytmNewtona(double x, double y, double z, double **macierz) {
 	// Wyznaczenie Jakobianu
 	macierz = uzupelnijJakobian(x, y, z);
 
+    // Wyznaczenie wektora abc
+    wektorABC[0] = obliczA(x, y, z);
+    wektorABC[1] = obliczB(x, y, z);
+    wektorABC[2] = obliczC(x, y, z);
+
+    // Wyznaczenie nowego przyblizenia
+    x = x - wektorABC[0];
+    y = y - wektorABC[1];
+    z = z - wektorABC[2];
+
+    // Wyznaczenie estymatora
+    estymator = max(fabs(wektorABC[0]), fabs(wektorABC[1]), fabs(wektorABC[2]));
+
+    // Wyznaczenie reziduum
+    reziduum = max(fabs(wartosciFunkcji[0]), fabs(wartosciFunkcji[1]), fabs(wartosciFunkcji[2]));
+
+    std::cout <<"Iteracja "<< i << "\nx: " << x << "\ny: " << y << "\nz: " << z << "\nestymator: " << estymator << "\nreziduum: " << reziduum << "\n\n";
+
 	// Warunki przerwania
 	if ((fabs(reziduum) <= TOLF) || (estymator <= TOLX) || (i >= MAXITERACJE)) {
 	  kontynuuj = false;
 	}
 
+    // Przypisanie do funkcji nowych wartosci
+    wartosciFunkcji[0] = funkcja1(x, y, z);
+    wartosciFunkcji[1] = funkcja2(x, y, z);
+    wartosciFunkcji[2] = funkcja3(x, y, z);
+
 	i++;
   }
+
+  // Dealokacja pamieci 
+  if(macierz != NULL){
+    for (int j = 0; j < 3; ++j)
+      delete [] macierz[j];
+
+    delete macierz;
+    macierz = NULL;
+  }
+}
+
+int main() {
+  algorytmNewtona(5.0, 3.0, 5.0);
+
+  return 0;
 }
