@@ -68,10 +68,10 @@ bool sprawdzZmienne(double x, double y, double z) {
 	std::cout << "Nieprawidlowy x\n";
 	return false;
   } else if (z == 0) {
-	std::cout << "Nieprawidlowy y\n";
+	std::cout << "Nieprawidlowy z\n";
 	return false;
   } else if (y == -1 / 2 || 4 * y * x + 2 * x == 0) {
-	std::cout << "Nieprawidlowy z\n";
+	std::cout << "Nieprawidlowy x lub y\n";
 	return false;
   } else
 	return true;
@@ -114,10 +114,6 @@ void algorytmNewtona(double x, double y, double z) {
   int i = 1;
   bool kontynuuj = true;
 
-  wartosciFunkcji[0] = funkcja1(x, y, z);
-  wartosciFunkcji[1] = funkcja2(x, y, z);
-  wartosciFunkcji[2] = funkcja3(x, y, z);
-
   while (kontynuuj) {
 	// Wyzerowanie wektora przy kazdej iteracji
 	for (int j = 0; j < 3; ++j)
@@ -129,7 +125,7 @@ void algorytmNewtona(double x, double y, double z) {
 	// Wyznaczenie Jakobianu
 	macierz = uzupelnijJakobian(x, y, z);
 
-    // Wyznaczenie wektora abc
+    // Wyznaczenie wektora abc (wektor delta)
     wektorABC[0] = obliczA(x, y, z);
     wektorABC[1] = obliczB(x, y, z);
     wektorABC[2] = obliczC(x, y, z);
@@ -138,6 +134,11 @@ void algorytmNewtona(double x, double y, double z) {
     x = x - wektorABC[0];
     y = y - wektorABC[1];
     z = z - wektorABC[2];
+
+    // Przypisanie do funkcji nowych wartosci
+    wartosciFunkcji[0] = funkcja1(x, y, z);
+    wartosciFunkcji[1] = funkcja2(x, y, z);
+    wartosciFunkcji[2] = funkcja3(x, y, z);
 
     // Wyznaczenie estymatora
     estymator = max(fabs(wektorABC[0]), fabs(wektorABC[1]), fabs(wektorABC[2]));
@@ -152,11 +153,6 @@ void algorytmNewtona(double x, double y, double z) {
 	if ((fabs(reziduum) <= TOLF) || (estymator <= TOLX) || (i >= MAXITERACJE)) {
 	  kontynuuj = false;
 	}
-
-    // Przypisanie do funkcji nowych wartosci
-    wartosciFunkcji[0] = funkcja1(x, y, z);
-    wartosciFunkcji[1] = funkcja2(x, y, z);
-    wartosciFunkcji[2] = funkcja3(x, y, z);
 
 	i++;
   }
