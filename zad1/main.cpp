@@ -52,5 +52,5 @@ int main() {
   }
   // iloczyn maszynowy = precyzjaDouble * 2
   std::cout << "\n--------------FLOAT--------------\n";
-  std::cout << "Iloczyn maszynowy wynosi: " << 2 * precyzjaFloat << "\n" << "Liczba bitow mantysy: " << licznikBitowFloat;
+  std::cout << "Iloczyn maszynowy wynosi: " << 2.0f * precyzjaFloat << "\n" << "Liczba bitow mantysy: " << licznikBitowFloat;
 }
