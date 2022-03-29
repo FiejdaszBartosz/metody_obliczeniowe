@@ -64,13 +64,13 @@ double obliczC(double x, double y, double z) {
  * @return false - jesli podane punkty nie naleza do dziedziny funkcji
  */
 bool sprawdzZmienne(double x, double y, double z) {
-  if (x == 0) {
+  if (x == 0.0) {
 	std::cout << "Nieprawidlowy x\n";
 	return false;
-  } else if (z == 0) {
+  } else if (z == 0.0) {
 	std::cout << "Nieprawidlowy z\n";
 	return false;
-  } else if (y == -1 / 2 || 4 * y * x + 2 * x == 0) {
+  } else if (y == -1.0 / 2.0 || 4.0 * y * x + 2.0 * x == 0.0) {
 	std::cout << "Nieprawidlowy x lub y\n";
 	return false;
   } else
@@ -78,38 +78,10 @@ bool sprawdzZmienne(double x, double y, double z) {
 }
 
 /**
- * @brief Funkcja tworzy jakobian. Zostal on wyznaczony wczesniej na kartce
- * @param x
- * @param y
- * @param z
- * @return wskaznik do jakobianu 3x3
- */
-double **uzupelnijJakobian(double x, double y, double z) {
-  // Storzenie pomocniczej macierzy 3x3
-  double **temp = new double *[3];
-  for (int i = 0; i < 3; ++i) {
-	temp[i] = new double[3];
-  }
-
-  temp[0][0] = 2.0 * x;
-  temp[0][1] = 2.0 * y;
-  temp[0][2] = 2.0 * z;
-  temp[1][0] = 2.0 * x;
-  temp[1][1] = 2.0 * y;
-  temp[1][2] = 0.0;
-  temp[2][0] = 2.0 * x;
-  temp[2][1] = -1.0;
-  temp[2][2] = 0.0;
-
-  return temp;
-}
-
-/**
  * @brief Funkcja realizujaca uogolnioną metodę Newtona rozwiązywania układu trzech algebraicznych rownań nieliniowych
  * @param x, y, z - wartosci poczatkowe
  */
 void algorytmNewtona(double x, double y, double z) {
-  double **macierz = NULL;
   double estymator = 0.0, reziduum = 0.0, wartosciFunkcji[3], wektorABC[3];
   int i = 1;
   bool kontynuuj = true;
@@ -121,9 +93,6 @@ void algorytmNewtona(double x, double y, double z) {
 
 	if (!sprawdzZmienne(x, y, z))
 	  break;
-
-	// Wyznaczenie Jakobianu
-	macierz = uzupelnijJakobian(x, y, z);
 
     // Wyznaczenie wektora abc (wektor delta)
     wektorABC[0] = obliczA(x, y, z);
@@ -155,15 +124,6 @@ void algorytmNewtona(double x, double y, double z) {
 	}
 
 	i++;
-  }
-
-  // Dealokacja pamieci
-  if(macierz != NULL){
-    for (int j = 0; j < 3; ++j)
-      delete [] macierz[j];
-
-    delete macierz;
-    macierz = NULL;
   }
 }
 

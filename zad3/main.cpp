@@ -5,7 +5,7 @@
 #include <iostream>
 #include <cmath>
 
-// funkcje z zadania wraz z obliczonym fi oraz pochodna z fi
+// Funkcje z zadania wraz z obliczonym fi oraz pochodna z fi
 double funkcja1(double x) {
   double pom = 1.0;
 
@@ -53,7 +53,7 @@ double pochodnaFi2(double x) {
 typedef double (*funkcja)(double);
 
 /**
- * @brief metoda Picarda do rozwiazywania algebraicznych równań nielinowych
+ * @brief Metoda Picarda do rozwiazywania algebraicznych równań nielinowych
  * @param fPoczatkowa funkcja dla której będziemy szukać rowzwiązania
  * @param fi funkcja Fi czyli przekształcenie funkcji do postaci x = ...
  * @param pochodnaFi pochodna z funkcji Fi
@@ -61,7 +61,7 @@ typedef double (*funkcja)(double);
  * @param maxIteracje maksymalna liczba iteracji
  * @param tolX zadana tolerancja błedu
  * @param tolF zadana tolerancja reziduum
- * @return 0 w przypadku powodzenia
+ * @return 1 w przypadku powodzenia
  * @return -1 w przypadku niepowodzenia
  */
 double picard(funkcja fPoczatkowa, funkcja fi, funkcja pochodnaFi, double x, double maxIteracje,
@@ -95,25 +95,25 @@ double picard(funkcja fPoczatkowa, funkcja fi, funkcja pochodnaFi, double x, dou
     std::cout << residuum << "\t\t" << estymator << "\n";
 
     // Warunki przerwania
-    if ((fabs(residuum) <= tolF) || (estymator <= tolX) || (i >= maxIteracje)) {
+    if ((fabs(residuum) <= tolF) && (estymator <= tolX) || (i >= maxIteracje)) {
       kontynuuj = false;
     }
 
     i++;
   }
 
-  return 0;
+  return 1;
 }
 
 /**
- * @brief metoda bisekcji do rozwiazywania algebraicznych równań nielinowych
+ * @brief Metoda bisekcji do rozwiazywania algebraicznych równań nielinowych
  * @param fPoczatkowa funkcja dla której będziemy szukać rowzwiązania
  * @param a lewy koniec przedziału
  * @param b prawy koniec przedziału
  * @param maxIteracje maksymalna liczba iteracji
  * @param tolX zadana tolerancja błedu
  * @param tolF zadana tolerancja reziduum
- * @return 0 w przypadku powodzenia
+ * @return 1 w przypadku powodzenia
  * @return -1 w przypadku niepowodzenia
  */
 double bisekcja(funkcja fPoczatkowa, double a, double b, double maxIteracje, double tolX, double tolF) {
@@ -145,25 +145,25 @@ double bisekcja(funkcja fPoczatkowa, double a, double b, double maxIteracje, dou
       a = x;
 
     // Warunki przerwania
-    if ((fabs(residuum) <= tolF) || (estymator <= tolX) || (i >= maxIteracje)) {
+    if ((fabs(residuum) <= tolF) && (estymator <= tolX) || (i >= maxIteracje)) {
       kontynuuj = false;
     }
 
     i++;
   }
 
-  return 0;
+  return 1;
 }
 
 /**
- * @brief metoda Newtona do rozwiazywania algebraicznych równań nielinowych
+ * @brief Metoda Newtona do rozwiazywania algebraicznych równań nielinowych
  * @param fPoczatkowa funkcja dla której będziemy szukać rowzwiązania
  * @param fPochodna pochodna z funkcji
  * @param x punkt początkowy
  * @param maxIteracje maksymalna liczba iteracji
  * @param tolX zadana tolerancja błedu
  * @param tolF zadana tolerancja reziduum
- * @return 0 w przypadku powodzenia
+ * @return 1 w przypadku powodzenia
  */
 double newton(funkcja fPoczatkowa, funkcja fPochodna, double x, double maxIteracje, double tolX, double tolF) {
   double x0 = x, x1 = 0.0, estymator = 0.0, residuum = 0.0;
@@ -190,18 +190,18 @@ double newton(funkcja fPoczatkowa, funkcja fPochodna, double x, double maxIterac
     i++;
   }
 
-  return 0;
+  return 1;
 }
 
 /**
- * @brief metoda siecznych do rozwiazywania algebraicznych równań nielinowych
+ * @brief Metoda siecznych do rozwiazywania algebraicznych równań nielinowych
  * @param fPoczatkowa funkcja dla której będziemy szukać rowzwiązania
  * @param x0 punkt
  * @param x1 punkt x0 + delta x
  * @param maxIteracje maksymalna liczba iteracji
  * @param tolX zadana tolerancja błedu
  * @param tolF zadana tolerancja reziduum
- * @return 0 w przypadku powodzenia
+ * @return 1 w przypadku powodzenia
  */
 double siecznych(funkcja fPoczatkowa, double x0, double x1, double maxIteracje, double tolX, double tolF) {
   double x2 = 0.0, estymator = 0.0, residuum = 0.0;
@@ -229,7 +229,7 @@ double siecznych(funkcja fPoczatkowa, double x0, double x1, double maxIteracje, 
     i++;
   }
 
-  return 0;
+  return 1;
 }
 
 int main() {
@@ -256,7 +256,7 @@ int main() {
   picard(funkcja2, fi2, pochodnaFi2, 1, iteracje, blad, blad);
 
   std::cout << "\n\nMetoda Bisekcji:\n";
-  bisekcja(funkcja2, -4, 10, iteracje, blad, blad);
+  bisekcja(funkcja2, 0.3, 0.6, iteracje, blad, blad);
 
   std::cout << "\n\nMetoda Newtona:\n";
   newton(funkcja2, pochodnaFunkcji2, 0.4, iteracje, blad, blad);
