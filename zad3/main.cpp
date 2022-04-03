@@ -234,7 +234,7 @@ double siecznych(funkcja fPoczatkowa, double x0, double x1, double maxIteracje, 
 
 int main() {
   const int iteracje = 100;
-  const double blad = 1e-15;
+  const double blad = 1e-12;
 
   std::cout << "***************** Pierwsze rownanie *****************\n";
 
