@@ -4,6 +4,9 @@
 
 #include <iostream>
 #include <cmath>
+#include <iomanip>
+
+#define N 4
 
 /**
  * Tworzy macierz kwadratowa o podanym rozmiarze
@@ -23,11 +26,10 @@ double **stworzMacierz(int n) {
  * @param n rozmiar macierzy
  */
 void usunMacierz(double **pMacierz, int n) {
-  for (int i = n - 1; i >= 0; --i) {
+  for (int i = 0; i < n; i++)
     delete[] pMacierz[i];
 
-    delete pMacierz;
-  }
+  delete[] pMacierz;
 }
 
 /**
@@ -42,9 +44,18 @@ void uzupelnijMacierz(double **pMacierz, int n) {
        {9.0, -180.0, 11.0, -12.0},
        {-16.0, 15.0, -140.0, 13.0}};
 
-  for (int i = 0; i < n; ++i)
-    for (int j = 0; j < n; ++j)
-      pMacierz[i][j] = pMacierz[i][j];
+  for (int i = 0; i < n; i++)
+    for (int j = 0; j < n; j++)
+      pMacierz[i][j] = macierzZadana[i][j];
+}
+/**
+ * Wyswietla podany wektor
+ * @param b wskaznik do wektora
+ * @param n rozmiar wektora
+ */
+void wyswietlWektor(double *b, int n) {
+  for (int i = 0; i < n; i++)
+    std::cout << b[i] << "\n";
 }
 
 /**
@@ -54,9 +65,9 @@ void uzupelnijMacierz(double **pMacierz, int n) {
  * @param index indeks w macierzy
  */
 void wyswietlMacierz(double **pMacierz, int n, int *index) {
-  for (int i = 0; i < n; ++i) {
-    for (int j = 0; j < n; ++j)
-      std::cout << "  " << pMacierz[index[i]][j] << "\t";
+  for (int i = 0; i < n; i++) {
+    for (int j = 0; j < n; j++)
+      std::cout << std::setw(8) << pMacierz[index[i]][j] << "\t";
     std::cout << "\n";
   }
 }
@@ -70,29 +81,33 @@ void wyswietlMacierz(double **pMacierz, int n, int *index) {
  * @return wiersz po zamianie
  */
 int elementPodstawowy(double **pMacierz, int n, int j, int *index) {
-  int wiersz;
+  int numerWiersza;
+  // Szuka wartosci najwiekszej w kolumnie ponizej komorki [j][j]
   for (int i = j; i < n; i++) {
     if (std::fabs(pMacierz[index[i]][j]) < std::fabs(pMacierz[index[i + 1]][j]))
-      wiersz = index[i + 1];
+      numerWiersza = index[i + 1];
     else
-      wiersz = index[i];
+      numerWiersza = index[i];
   }
 
-  return wiersz;
+  return numerWiersza;
 }
 
 void gauss(double **pMacierz, int *index) {
   int wiersz;
-  double v;
+  double v;   // Element ponizej diagonali
+  // poruszanie sie po diagonali
   for (int k = 0; k < 3; k++) {
     if (pMacierz[index[k]][index[k]] == 0.0) {
-      wiersz = elementPodstawowy(pMacierz, index[k], 3, index);
+      wiersz = elementPodstawowy(pMacierz, 3, index[k], index);
       // Zapisanie zmian w tablicy indeksow
       index[wiersz] = index[k];
       index[k] = wiersz;
     }
+    // Zejscie w dol po kolumnie
     for (int i = k + 1; i < 4; i++) {
       v = pMacierz[index[i]][k];
+      // Poruszanie sie w prawo po wierszu
       for (int j = k + 1; j < 4; j++) {
         // Obliczanie wartosci dla macierzy U
         pMacierz[index[i]][j] = pMacierz[index[i]][j] - pMacierz[index[k]][j] * (v / pMacierz[index[k]][k]);
@@ -123,7 +138,9 @@ void gauss(double **pMacierz, int *index) {
  */
 void wyznaczY(double **macierzL, double *wektorB, int *index, int n) {
   double suma = 0.0;
+  // Poruszanie sie po kolumnie, zaczyna od lewego gornego
   for (int i = 0; i <= n; i++) {
+    // Poruszanie sie wierszu w prawo
     for (int j = 0; j < i; j++)
       suma += macierzL[index[i]][j] * wektorB[index[j]];
 
@@ -133,8 +150,16 @@ void wyznaczY(double **macierzL, double *wektorB, int *index, int n) {
   }
 }
 
-void wyznaczU(double **macierzU, double *wektorB, int *index, int n) {
+/**
+ * Wyznaczenie x potrzebnego do rozwiazania powyzszego ukladu rownan
+ * @param macierzU maczierz U (trojkatna gorna)
+ * @param wektorB wektor b
+ * @param index tablica indexow
+ * @param n rozmiar macierzy
+ */
+void wyznaczX(double **macierzU, double *wektorB, int *index, int n) {
   double suma = 0.0;
+  // Zaczyna od prawego dolnego rogu
   for (int i = n; i >= 0; i--) {
     for (int j = i + 1; j <= n; j++)
       suma += macierzU[index[i]][j] * wektorB[index[j]];
@@ -146,5 +171,29 @@ void wyznaczU(double **macierzU, double *wektorB, int *index, int n) {
 }
 
 int main() {
+  double **matrix = stworzMacierz(N);
+  double b[4] = {35.0, 104.0, -366.0, -354.0};
+  int index[4] = {0, 1, 2, 3};
 
+  uzupelnijMacierz(matrix, N);
+
+  std::cout << "Dana w zadaniu macierz A:\n";
+  wyswietlMacierz(matrix, N, index);
+
+  gauss(matrix, index);
+  std::cout << "\n\nMacierz po dekompozycji LU:\n";
+  wyswietlMacierz(matrix, N, index);
+
+  std::cout << "\n\nRoziwiazanie ukladu rownan Ax = b:\n";
+  wyznaczY(matrix, b, index, N - 1);
+  std::cout << "\n\nWektor y:\n";
+  wyswietlWektor(b, N);
+  std::cout << "\n\n";
+
+  wyznaczX(matrix, b, index, N - 1);
+  std::cout << "\n\nWektor x (Ux = y):\n";
+  wyswietlWektor(b, N);
+
+  usunMacierz(matrix, N);
+  return 0;
 }
