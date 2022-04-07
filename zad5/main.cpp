@@ -7,6 +7,9 @@
 #include <iomanip>
 
 #define N 4
+#define stala 1e-16;
+
+#define opcja2
 
 /**
  * Tworzy macierz kwadratowa o podanym rozmiarze
@@ -38,11 +41,21 @@ void usunMacierz(double **pMacierz, int n) {
  * @param n wymiar macierzy
  */
 void uzupelnijMacierz(double **pMacierz, int n) {
+#ifdef opcja1
   double macierzZadana[4][4] =
       {{1.0, -20.0, 30.0, -4.0},
        {2.0, -40.0, -6.0, 50.0},
        {9.0, -180.0, 11.0, -12.0},
        {-16.0, 15.0, -140.0, 13.0}};
+#endif
+#ifdef opcja2
+  double E = stala;
+  double macierzZadana[4][4] =
+      {{1.0 + E, 1.0, 1.0, 1.0},
+       {1.0, 1.0 + E, 1.0, 1.0},
+       {1.0, 1.0, 1.0 + E, 1.0},
+       {1.0, 1.0, 1.0, 1.0 + E}};
+#endif
 
   for (int i = 0; i < n; i++)
     for (int j = 0; j < n; j++)
@@ -164,7 +177,12 @@ void wyznaczX(double **macierzU, double *wektorB, int *index, int n) {
     for (int j = i + 1; j <= n; j++)
       suma += macierzU[index[i]][j] * wektorB[index[j]];
 
-    wektorB[index[i]] = (wektorB[index[i]] - suma) / (macierzU[index[i]][i]);
+#ifdef opcja2
+    if(macierzU[index[i]][i] == 0)
+      std::cout << "DZIELENIE PRZEZ 0\n";
+#endif
+
+    wektorB[index[i]] = (wektorB[index[i]] - suma) / (macierzU[index[i]][i]);     //UWAGA MOŻLIWE DZIELENIE PRZEZ 0
 
     suma = 0.0;
   }
@@ -172,8 +190,16 @@ void wyznaczX(double **macierzU, double *wektorB, int *index, int n) {
 
 int main() {
   double **matrix = stworzMacierz(N);
-  double b[4] = {35.0, 104.0, -366.0, -354.0};
   int index[4] = {0, 1, 2, 3};
+
+#ifdef opcja1
+  double b[4] = {35.0, 104.0, -366.0, -354.0};
+#endif
+
+#ifdef opcja2
+  double E = stala;
+  double b[4] = {6.0 + E, 6.0 + 2.0 * E, 6.0 + 2.0 * E, 6.0 + E};
+#endif
 
   uzupelnijMacierz(matrix, N);
 
