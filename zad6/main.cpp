@@ -36,11 +36,11 @@ void rozwiazB(double *u, double *l, double *b, double *x, double *eta, double *r
 }
 
 void uzupelnijWektor(double *u, double *d, double *l, double *b) {
-  u[0] = 0.5;
-  u[1] = 0.25;
+  u[0] = 1.0 / 2.0;
+  u[1] = 1.0 / 4.0;
   u[2] = 1.0 / 6.0;
-  u[3] = 0.125;
-  u[4] = 0.01;
+  u[3] = 1.0 / 8.0;
+  u[4] = 1.0 / 10.0;
 
   d[0] = 10.0;
   d[1] = 20.0;
@@ -50,13 +50,13 @@ void uzupelnijWektor(double *u, double *d, double *l, double *b) {
   d[5] = 10.0;
 
   l[0] = 1.0 / 3.0;
-  l[1] = 0.2;
+  l[1] = 1.0 / 5.0;
   l[2] = 1.0 / 7.0;
   l[3] = 1.0 / 9.0;
   l[4] = 1.0 / 11.0;
 
   b[0] = 31.0;
-  b[1] = 41.25;
+  b[1] = 165.0 / 4.0;
   b[2] = 917.0 / 30.0;
   b[3] = 851.0 / 28.0;
   b[4] = 3637.0 / 90.0;
