@@ -5,6 +5,9 @@
 #include <iostream>
 
 #define N 6
+#define opcja2
+
+// W funkcja zastosowalem wzory z wykladu
 
 void rozwiazA(double *u, double *d, double *l, double *eta, int rozmiar) {
   // Wykonanie pierwszego kroku dla A
@@ -36,6 +39,7 @@ void rozwiazB(double *u, double *l, double *b, double *x, double *eta, double *r
 }
 
 void uzupelnijWektor(double *u, double *d, double *l, double *b) {
+#ifdef opcja1
   u[0] = 1.0 / 2.0;
   u[1] = 1.0 / 4.0;
   u[2] = 1.0 / 6.0;
@@ -61,6 +65,35 @@ void uzupelnijWektor(double *u, double *d, double *l, double *b) {
   b[3] = 851.0 / 28.0;
   b[4] = 3637.0 / 90.0;
   b[5] = 332.0 / 11.0;
+#endif
+
+#ifdef opcja2
+  u[0] = 0.5;
+  u[1] = 0.25;
+  u[2] = 1.0 / 6.0;
+  u[3] = 0.125;
+  u[4] = 0.01;
+
+  d[0] = 10.0;
+  d[1] = 20.0;
+  d[2] = 30.0;
+  d[3] = 30.0;
+  d[4] = 20.0;
+  d[5] = 10.0;
+
+  l[0] = 1.0 / 3.0;
+  l[1] = 0.2;
+  l[2] = 1.0 / 7.0;
+  l[3] = 1.0 / 9.0;
+  l[4] = 1.0 / 11.0;
+
+  b[0] = 31.0;
+  b[1] = 41.25;
+  b[2] = 917.0 / 30.0;
+  b[3] = 851.0 / 28.0;
+  b[4] = 3637.0 / 90.0;
+  b[5] = 332.0 / 11.0;
+#endif
 }
 
 void wyswietlWektor(double *wektor, int rozmiar) {
