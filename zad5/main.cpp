@@ -7,9 +7,27 @@
 #include <iomanip>
 
 #define N 4
-#define stala 1e-16;
+#define stala 1e-8;
 
 #define opcja2
+
+void max(double *x, double *y) {
+  double temp[4];
+  double blad;
+
+  for (int i = 0; i < 4; ++i) {
+    temp[i] = std::fabs(x[i] - y[i]);
+  }
+
+  blad = temp[0];
+
+  for (int i = 1; i < 4; ++i) {
+    if(temp[i] > blad)
+      blad = temp[i];
+  }
+
+  std::cout << "blad ->" << blad << "\n";
+}
 
 /**
  * Tworzy macierz kwadratowa o podanym rozmiarze
@@ -66,9 +84,9 @@ void uzupelnijMacierz(double **pMacierz, int n) {
  * @param b wskaznik do wektora
  * @param n rozmiar wektora
  */
-void wyswietlWektor(double *b, int n) {
+void wyswietlWektor(double *b, int n, int *index) {
   for (int i = 0; i < n; i++)
-    std::cout << b[i] << "\n";
+    std::cout << b[index[i]] << "\n";
 }
 
 /**
@@ -111,7 +129,7 @@ void gauss(double **pMacierz, int *index) {
   double v;   // Element ponizej diagonali
   // poruszanie sie po diagonali
   for (int k = 0; k < 3; k++) {
-    if (pMacierz[index[k]][index[k]] == 0.0) {
+    if (pMacierz[index[k]][k] == 0.0) {
       wiersz = elementPodstawowy(pMacierz, 3, index[k], index);
       // Zapisanie zmian w tablicy indeksow
       index[wiersz] = index[k];
@@ -157,7 +175,7 @@ void wyznaczY(double **macierzL, double *wektorB, int *index, int n) {
     for (int j = 0; j < i; j++)
       suma += macierzL[index[i]][j] * wektorB[index[j]];
 
-    wektorB[index[i]] = (wektorB[index[i]] - suma) / 1.0;     //Na glownej przekatnej sa 1
+    wektorB[index[i]] = (wektorB[index[i]] - suma) / 1.0;     //Na glownej przekatnej sa 1, bo L jest polaczone z U
 
     suma = 0.0;
   }
@@ -199,6 +217,12 @@ int main() {
 #ifdef opcja2
   double E = stala;
   double b[4] = {6.0 + E, 6.0 + 2.0 * E, 6.0 + 2.0 * E, 6.0 + E};
+  double b1, b2, b3, b4;
+  b1 = 1;
+  b2 = 2;
+  b3 = 2;
+  b4 = 1;
+  double dokladny[4] = {b1, b2, b3, b4};
 #endif
 
   uzupelnijMacierz(matrix, N);
@@ -213,12 +237,14 @@ int main() {
   std::cout << "\n\nRoziwiazanie ukladu rownan Ax = b:\n";
   wyznaczY(matrix, b, index, N - 1);
   std::cout << "\n\nWektor y:\n";
-  wyswietlWektor(b, N);
+  wyswietlWektor(b, N, index);
   std::cout << "\n\n";
 
   wyznaczX(matrix, b, index, N - 1);
   std::cout << "\n\nWektor x (Ux = y):\n";
-  wyswietlWektor(b, N);
+  wyswietlWektor(b, N, index);
+
+  max(b, dokladny);
 
   usunMacierz(matrix, N);
   return 0;
