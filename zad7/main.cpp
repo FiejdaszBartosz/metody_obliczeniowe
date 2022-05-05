@@ -5,28 +5,40 @@
 #include <iostream>
 #include <cmath>
 
-#define TOLF 10e-10 //ustawienie tolerancji residuum
-#define TOLX 10e-10 //ustawienie tolerancji estymatora
+#define TOLF 1e-10 //ustawienie tolerancji residuum
+#define TOLX 1e-10 //ustawienie tolerancji estymatora
 #define ITERACJE 50 //ustawienie liczby iteracji
 
 void uzupelnijDane(double **pA, double *pB, double *pX) {
-  pA[0][0] = 10.0;
-  pA[0][1] = 1.0;
+  pA[0][0] = 100.0;
+  pA[0][1] = -1.0;
   pA[0][2] = 2.0;
-  pA[1][0] = 1.0;
-  pA[1][1] = 20.0;
-  pA[1][2] = 5.0;
-  pA[2][0] = 3.0;
-  pA[2][1] = 4.0;
-  pA[2][2] = 30.0;
+  pA[0][3] = -3.0;
 
-  pB[0] = 8.0;
-  pB[1] = -4.0;
-  pB[2] = -27.0;
+  pA[1][0] = 1.0;
+  pA[1][1] = 200.0;
+  pA[1][2] = -4.0;
+  pA[1][3] = 5.0;
+
+  pA[2][0] = -2.0;
+  pA[2][1] = 4.0;
+  pA[2][2] = 300.0;
+  pA[2][3] = -6.0;
+
+  pA[3][0] = 3.0;
+  pA[3][1] = -5.0;
+  pA[3][2] = 6.0;
+  pA[3][3] = 400.0;
+
+  pB[0] = 116.0;
+  pB[1] = -226.0;
+  pB[2] = 912.0;
+  pB[3] = -1174.0;
 
   pX[0] = 2.0;
   pX[1] = 2.0;
   pX[2] = 2.0;
+  pX[3] = 2.0;
 }
 
 void wypiszMacierz(double **A, double n) //funkcja do wypisywania macierzy
@@ -42,7 +54,7 @@ void wypiszMacierz(double **A, double n) //funkcja do wypisywania macierzy
 void wypiszWektor(double *wektor, double n) //funkcja do wyisywania wektorów
 {
   for (int i = 0; i < n; i++)
-    std::cout << wektor[i] << "  ";
+    std::cout << wektor[i] << "\t\t";
 }
 
 double maximum(double *tab, int n) //funkcja znajdująca największą wartość w wektorze/tablicy
@@ -93,7 +105,7 @@ void metodaJacobiego(double **pA, double *pB, double *pX, int n) {
 
     std::cout << licznik << "\t";
     wypiszWektor(pX, n);
-    std::cout << "\t" << res << "\t" << est << "\n";
+    std::cout << "\t" << res << "\t\t" << est << "\n";
 
     if ((res <= TOLF && est <= TOLX) || (licznik >= ITERACJE)) {
       kontynuuj = false;
@@ -140,7 +152,7 @@ void metodaGaussaSeidela(double **pA, double *pB, double *pX, int n) {
 
     std::cout << licznik << "\t";
     wypiszWektor(pX, n);
-    std::cout << "\t" << res << "\t" << est << "\n";
+    std::cout << "\t" << res << "\t\t" << est << "\n";
 
     if ((res <= TOLF && est <= TOLX) || (licznik >= ITERACJE)) {
       kontynuuj = false;
@@ -187,7 +199,7 @@ void metodaSor(double **pA, double *pB, double *pX, double omega, int n) {
 
     std::cout << licznik << "\t";
     wypiszWektor(pX, n);
-    std::cout << "\t" << res << "\t" << est << "\n";
+    std::cout << "\t" << res << "\t\t" << est << "\n";
 
     if ((res <= TOLF && est <= TOLX) || (licznik >= ITERACJE)) {
       kontynuuj = false;
@@ -198,7 +210,7 @@ void metodaSor(double **pA, double *pB, double *pX, double omega, int n) {
 }
 
 int main() {
-  int n = 3;
+  int n = 4;
   double **A, *b, *x;
   A = new double *[n];
 
@@ -212,11 +224,12 @@ int main() {
 
   std::cout << "Macierz A:\n";
   wypiszMacierz(A, n);
-  std::cout << "\n";
-  std::cout << " Wektor b:\n";
+  std::cout << "Wektor b:\n";
   wypiszWektor(b, n);
-  std::cout << " Wektor x:\n";
+  std::cout << "\n";
+  std::cout << "Wektor x:\n";
   wypiszWektor(x, n);
+  std::cout << "\n";
 
   std::cout << "Metoda Jacobiego" << "\n";
   metodaJacobiego(A, b, x, n);
