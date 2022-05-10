@@ -18,21 +18,21 @@ template<typename T>
 T dokladnaPochodna(T x) { return cos(x); }
 
 template<typename T>
-T roznicaProgresywna2punktowa(T x, T h) { return funkcjaZadana(x + h) - funkcjaZadana(x) / h; }
+T roznicaProgresywna2punktowa(T x, T h) { return (funkcjaZadana(x + h) - funkcjaZadana(x)) / h; }
 
 template<typename T>
-T roznicaCentralna2punktowa(T x, T h) { return funkcjaZadana(x + h) - funkcjaZadana(x - h) / (2.0 * h); }
+T roznicaCentralna2punktowa(T x, T h) { return (funkcjaZadana(x + h) - funkcjaZadana(x - h)) / (2.0 * h); }
 
 template<typename T>
-T roznicaWsteczna2punktowa(T x, T h) { return funkcjaZadana(x) - funkcjaZadana(x - h) / h; }
+T roznicaWsteczna2punktowa(T x, T h) { return (funkcjaZadana(x) - funkcjaZadana(x - h)) / h; }
 
 template<typename T>
 T roznicaProgresywna3punktowa(T x, T h) {
-  return (-3.0 / 2.0 * funkcjaZadana(x) + 2.0 * funkcjaZadana(x + h) - 1.0 / 2.0 * funkcjaZadana(x + h + h)) / (h);
+  return (-3.0 / 2.0 * funkcjaZadana(x) + 2.0 * funkcjaZadana(x + h) - 1.0 / 2.0 * funkcjaZadana(x + h + h)) / h;
 }
 template<typename T>
 T roznicaWsteczna3punktowa(T x, T h) {
-  return (3.0 / 2.0 * funkcjaZadana(x) - 2.0 * funkcjaZadana(x - h) + 1.0 / 2.0 * funkcjaZadana(x - h - h)) / (h);
+  return (3.0 / 2.0 * funkcjaZadana(x) - 2.0 * funkcjaZadana(x - h) + 1.0 / 2.0 * funkcjaZadana(x - h - h)) / h;
 }
 
 template<typename T>
@@ -42,7 +42,7 @@ T **oblicz(T **tablica) {
 
   // Przedzial [a, b] gdzie c to srodek
   T a = 0.0;
-  T b = 2.0;
+  T b = M_PI / 2.0;
   T c = (a + b) / 2.0;
 
   for (int i = 0; i < iteracje; ++i) {
@@ -128,3 +128,6 @@ int main() {
 }
 // os x - log10 z kroku
 // os y - log10 bledow
+
+// blad obciecia jest proporcjonalny do kroku
+// blad maszynowy jest odwrotnie proporcjonalny do kroku

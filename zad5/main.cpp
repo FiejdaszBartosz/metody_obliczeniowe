@@ -7,7 +7,7 @@
 #include <iomanip>
 
 #define N 4
-#define stala 1e-8;
+#define stala 1e-11;
 
 #define opcja2
 
@@ -26,7 +26,7 @@ void max(double *x, double *y) {
       blad = temp[i];
   }
 
-  std::cout << "blad ->" << blad << "\n";
+  std::cout << "blad -> " << blad << "\n";
 }
 
 /**
