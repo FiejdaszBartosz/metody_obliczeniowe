@@ -4,143 +4,206 @@
 
 #include <iostream>
 #include <fstream>
-#include <cmath>
+#include <math.h>
 
-double funkcjaBezposrednia(double dt, double tk, double yk) {
-  return yk + dt * (-((10.0 * tk * tk + 20.0) / (tk * tk + 1.0)) * (yk - 1.0));
-}
-double funkcjaAnalityczna(double tk) { return 1 - exp(-10.0 * (tk + atan(tk))); }
-double funkcjaPosrednia(double dt, double tk, double y_prev) {
-  double y, temp;
-  temp = (10.0 * (tk + dt) * (tk + dt) + 20.0) / ((tk + dt) * (tk + dt) + 1.0);
-  y = (y_prev + dt * temp) / (1 + dt * temp);
-  return y;
-}
-double funkcjaPosredniaBlad(double dt) {
-  double y, diff, tk = 0, maxDiff = 0.0, y_poprzednie = 0.0;
-  while (tk < 1.0) {
-    y = funkcjaPosrednia(dt, tk, y_poprzednie);
-    diff = fabs(funkcjaAnalityczna(tk) - y_poprzednie);
-    y_poprzednie = y;
-    if (diff > maxDiff) maxDiff = diff;
-    tk += dt;
-  }
-  return maxDiff;
+double rozwiazanieAnalityczne(double t); //funkcja do rozwiazywania równania analitycznie
+double bezposredniaEulera(double deltaT,
+                          double tmax); //funkcja do rozwiazywania równania za pomocą metody bezpośredniej Eulera
+double bezposredniaEuleraBlad(double deltaT, int b); //funkcja do obliczania błędu dla metody bezpośredniej Eulera
+double posredniaEulera(double deltaT, double t); //funkcja do rozwiazywania równania za pomocą metody bpośredniej Eulera
+double posredniaEuleraBlad(double deltaT, int ilosc); //funkcja do obliczania błędu dla metody pośredniej Eulera
+double trapezow(double deltaT, double t); //funkcja do rozwiazywania równania za pomocą metody trapezów
+double trapezowBlad(double deltaT, int ilosc); //funkcja do obliczania błędu dla metody trapezów
+
+/**
+ * Oblicza rozwiazanie analityczne od argumentu t
+ * @param t zmienna t
+ * @return wynik
+ */
+double rozwiazanieAnalityczne(double t) {
+  return 1 - exp(-10.0 * (t + atan(t)));
 }
 
-double funkcjaBezposredniaBlad(double dt) {
-  double y, maxDiff = 0.0, diff, tk = 0, y_poprzednie = 0.0;
-  while (tk < 1.0) {
-    y = funkcjaBezposrednia(dt, tk, y_poprzednie);
-    diff = fabs(funkcjaAnalityczna(tk) - y_poprzednie);
-    y_poprzednie = y;
-    if (diff > maxDiff)
-      maxDiff = diff;
-    tk += dt;
+/**
+ * Realizacja bezposredniej metody Eulera. Wzor obliczony wczesniej na kartce
+ * @param deltaT
+ * @param t zmienna t
+ * @return przyblizenie
+ */
+double bezposredniaEulera(double deltaT, double t) {
+  double yk = 0.0; // Warunek poczatkowy
+
+  for (double tk = 0.0; tk < t; tk += deltaT) {
+    yk = yk + deltaT * (-((10.0 * tk * tk + 20.0) / (tk * tk + 1.0)) * (yk - 1.0));
   }
-  return maxDiff;
+
+  return yk;
 }
-double funkcjaTrapezow(double dt, double tk, double y_poprzedni) {
-  double y, tempf, tempf1, i;
-  while (i < tk) {
-    tempf = ((10.0 * i * i + 20.0) / (i * i + 1.0)); //część f(tk,yk)
-    tempf1 = (10.0 * (i + dt) * (i + dt) + 20.0) / ((i + dt) * (i + dt) + 1.0);
-    y = ((-dt / 2.0) * (tempf * (y_poprzedni - 1.0) - tempf1) + y_poprzedni) / (1.0
-        + (dt / 2.0) * tempf1);
-    i += dt;
+
+/**
+ * Realizacja bezposredniej metody Eulera ze zwroceniem bledu
+ * @param deltaT krok
+ * @param ilosc liczba iteracji
+ * @return najwieksza roznica pomiedzy yk a wynikiem analitycznym
+ */
+double bezposredniaEuleraBlad(double deltaT, int ilosc) {
+  double yk = 0.0;
+  double blad = 0.0;
+  double tk = deltaT;
+  double wynikAnalityczny;
+  double roznica = 0.0;
+
+  for (int i = 0; i < ilosc; i++) {
+    wynikAnalityczny = rozwiazanieAnalityczne(tk);
+
+    yk = (-((10.0 * tk * tk + 20.0) / (tk * tk + 1.0)) * (yk - 1.0)) * deltaT + yk;
+
+    roznica = fabs(wynikAnalityczny - yk);
+    if (roznica > blad) //znajdujemy największy błąd
+      blad = roznica;
+
+    tk += deltaT;
   }
-  return y;
+
+  return blad;
 }
-double funkcjaTrapezowBlad(double dt) {
-  double diff, tk = 0, y, maxDiff = 0.0, y_poprzedni = 0.0;
-  while (tk < 1.0) {
-    y = funkcjaTrapezow(dt, tk, y_poprzedni);
-    diff = fabs(funkcjaAnalityczna(tk) - y_poprzedni);
-    y_poprzedni = y;
-    if (diff > maxDiff)
-      maxDiff = diff;
-    tk += dt;
+
+/**
+ * Realizacja posredniej metody Eulera. Wzor obliczony wczesniej na kartce
+ * @param deltaT
+ * @param t zmienna t
+ * @return przyblizenie
+ */
+double posredniaEulera(double deltaT, double t) {
+  double yk = 0.0;
+  double temp;
+  for (double i = 0.0; i < t; i += deltaT) {
+    temp = (10.0 * (i + deltaT) * (i + deltaT) + 20.0) / ((i + deltaT) * (i + deltaT) + 1.0);
+    yk = (yk + deltaT * temp) / (1 + deltaT * temp);
   }
-  return maxDiff;
+  return yk;
+}
+
+/**
+ * Realizacja bezposredniej metody Eulera ze zwroceniem bledu
+ * @param deltaT krok
+ * @param ilosc liczba iteracji
+ * @return najwieksza roznica pomiedzy yk a wynikiem analitycznym
+ */
+double posredniaEuleraBlad(double deltaT, int ilosc) {
+  double yk = 0.0;
+  double blad = 0.0;
+  double tk = deltaT;
+  double wAnalityczna;
+  double wspolczynnik;
+  double roznica = 0.0;
+
+  for (int i = 0; i < ilosc; i++) {
+    wAnalityczna = rozwiazanieAnalityczne(tk);
+
+    wspolczynnik = (10.0 * (tk + deltaT) * (tk + deltaT) + 20.0) / ((tk + deltaT) * (tk + deltaT) + 1.0);
+    yk = (yk + deltaT * wspolczynnik) / (1 + deltaT * wspolczynnik);
+
+    roznica = fabs(wAnalityczna - yk);
+    if (roznica > blad)
+      blad = roznica;
+
+    tk += deltaT;
+  }
+  return blad;
+}
+
+/**
+ * Realizacja metody trapezow. Wzor obliczony wczesniej na kartce
+ * @param deltaT
+ * @param t zmienna t
+ * @return przyblizenie
+ */
+double trapezow(double deltaT, double t) {
+  double yk = 0.0, temp1, temp2;
+
+  for (double i = 0.0; i < t; i += deltaT) {
+    temp1 = ((10.0 * i * i + 20.0) / (i * i + 1.0));
+    temp2 = (10.0 * (i + deltaT) * (i + deltaT) + 20.0) / ((i + deltaT) * (i + deltaT) + 1.0);
+
+    yk = ((-deltaT / 2.0) * (temp1 * (yk - 1.0) - temp2) + yk) / (1.0 + (deltaT / 2.0) * temp2);
+  }
+
+  return yk;
+}
+
+/**
+ * Realizacja metody trapezow ze zwroceniem bledu
+ * @param deltaT krok
+ * @param ilosc liczba iteracji
+ * @return najwieksza roznica pomiedzy yk a wynikiem analitycznym
+ */
+double trapezowBlad(double deltaT, int ilosc) {
+  double blad = 0.0;
+  double t = deltaT;
+  double yk = 0.0;
+  double wAnalityczna;
+  double temp1, temp2;
+  double roznica = 0.0;
+
+  for (int i = 0; i < ilosc; i++) {
+    wAnalityczna = rozwiazanieAnalityczne(t);
+
+    temp1 = ((10.0 * t * t + 20.0) / (t * t + 1.0));
+    temp2 = (10.0 * (t + deltaT) * (t + deltaT) + 20.0) / ((t + deltaT) * (t + deltaT) + 1.0);
+
+    yk = ((-deltaT / 2.0) * (temp1 * (yk - 1.0) - temp2) + yk) / (1.0 + (deltaT / 2.0) * temp2);
+
+    roznica = fabs(wAnalityczna - yk);
+    if (roznica > blad)
+      blad = roznica;
+
+    t += deltaT;
+  }
+
+  return blad;
 }
 
 int main() {
-  std::fstream diffBezposrednia, diffPosrednia, diffTrapezow, resultsBezposredniaSTB, resultsPosrednia, resultsTrapezow,
-      resultsAnalitycznie, resultsBezposredniaNST; //tworzenie plików
-  diffBezposrednia.open("diffBezposrednia.txt", std::fstream::out); // otwieramy do zapisu
-  diffPosrednia.open("diffPosrednia.txt", std::fstream::out);
-  diffTrapezow.open("diffTrapezow.txt", std::fstream::out);
-  resultsBezposredniaSTB.open("resultsBezposredniaSTB.txt", std::fstream::out);
-  resultsPosrednia.open("resultsPosrednia.txt", std::fstream::out);
-  resultsTrapezow.open("resultsTrapezow.txt", std::fstream::out);
-  resultsAnalitycznie.open("resultsAnalitycznie.txt", std::fstream::out);
-  resultsBezposredniaNST.open("resultsBezposredniaNST.txt", std::fstream::out);
-  resultsBezposredniaSTB << std::scientific; //ustawienie precyzji
-  resultsPosrednia << std::scientific;
-  resultsTrapezow << std::scientific;
-  resultsAnalitycznie << std::scientific;
-  resultsBezposredniaNST << std::scientific;
-  diffBezposrednia << std::scientific;
-  diffPosrednia << std::scientific;
-  diffTrapezow << std::scientific;
-  double dt = 0.005, y_nastepne, yn = 0, tk = 0, blad, y_poprzednie;
-//analityczna
-  while (tk < 5.0) {
-    y_nastepne = funkcjaAnalityczna(tk);
-    resultsAnalitycznie << tk << " " << y_nastepne << "\n";
-    tk += dt;
+  std::fstream bledy, wyniki, wyniki2;
+
+  bledy.open("bledy.txt", std::fstream::out);
+  wyniki.open("wyniki.txt", std::fstream::out);
+  wyniki2.open("wyniki2.txt", std::fstream::out);
+
+  wyniki << std::scientific;
+  wyniki2 << std::scientific;
+  bledy << std::scientific;
+  std::cout.precision(10);
+
+  double h, analitycznieWynik, besWynik, bensWynik, peWynik, tWynik;
+  int N = 5000000; //maksymalna ilosć iteracji
+
+  // Obliczanie bledow z metody
+  h = 0.1;
+  for (h; h > 1e-16; h = h / 2) {
+    besWynik = log10(bezposredniaEuleraBlad(h, N)); //stabilna bezpośrednia Eulera
+    peWynik = log10(posredniaEuleraBlad(h, N));
+    tWynik = log10(trapezowBlad(h, N));
+    bledy << log10(h) << "\t" << besWynik << "\t" << peWynik << "\t" << tWynik << "\n";
   }
-  tk = 0;
-//bezpośrednia - stabilna
-  while (tk < 1.0) {
-    y_nastepne = funkcjaBezposrednia(dt, tk, yn);
-    yn = y_nastepne;
-    resultsBezposredniaSTB << tk << " " << y_nastepne << "\n";
-    tk += dt;
+
+  h = 0.01;
+  for (double t = 0; t < 5; t += 0.01) //pętla wyników do rysunku zależności y od zmiennej niezależnej t
+  {
+    analitycznieWynik = rozwiazanieAnalityczne(t);
+    peWynik = posredniaEulera(h, t);
+    tWynik = trapezow(h, t);
+    besWynik = bezposredniaEulera(h, t);
+    wyniki << t << "\t" << analitycznieWynik << "\t" << peWynik << "\t" << tWynik << "\t" << besWynik << "\n";
   }
-  dt = 0.2, yn = 0, tk = 0;
-//bezpośrednia - niestabilna
-  while (tk < 5.0) {
-    y_nastepne = funkcjaBezposrednia(dt, tk, yn);
-    resultsBezposredniaNST << tk << " " << y_nastepne << "\n";
-    yn = y_nastepne;
-    tk += dt;
+
+  h = 0.15;
+  for (double t = 0; t < 5; t += 0.15) {
+    bensWynik = bezposredniaEulera(h, t); //niestabilna bezpośrednia Eulera
+    wyniki2 << t << "\t" << rozwiazanieAnalityczne(t) << "\t" << bensWynik << "\n";
   }
-  dt = 0.005, tk = 0;
-  y_poprzednie = 0.0;
-//pośrednia
-  while (tk < 1.0) {
-    y_nastepne = funkcjaPosrednia(dt, tk, y_poprzednie);
-    y_poprzednie = y_nastepne;
-    resultsPosrednia << tk << " " << y_nastepne << "\n";
-    tk += dt;
-  }
-  tk = 0;
-//trapezów
-  y_poprzednie = 0.0;
-  while (tk < 1.0) {
-    y_nastepne = funkcjaTrapezow(dt, tk, y_poprzednie);
-    y_poprzednie = y_nastepne;
-    resultsTrapezow << tk << " " << y_nastepne << "\n";
-    tk += dt;
-  }
-// liczymy błędy maksymalne
-  dt = 0.1;
-  while (dt > 1e-14) {
-    blad = log10(funkcjaBezposredniaBlad(dt));
-    diffBezposrednia << log10(dt) << " " << blad << "\n";
-    blad = log10(funkcjaPosredniaBlad(dt));
-    diffPosrednia << log10(dt) << " " << blad << "\n";
-    blad = log10(funkcjaTrapezowBlad(dt));
-    diffTrapezow << log10(dt) << " " << blad << "\n";
-    dt = dt / 1.12;
-  }
-  resultsBezposredniaSTB.close(); //zamykamy pliki
-  resultsPosrednia.close();
-  resultsAnalitycznie.close();
-  resultsBezposredniaNST.close();
-  resultsTrapezow.close();
-  diffBezposrednia.close();
-  diffPosrednia.close();
-  diffTrapezow.close();
+  wyniki2.close();
+  bledy.close();
+  wyniki.close();
 }
