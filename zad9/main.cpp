@@ -93,7 +93,7 @@ int znajdzNajwiekszyBlad(double *blad, int N) {
  * @return blad
  */
 double Numerowa(double h, int N) {
-  double *l, *d, *u, *b, *x, *blad, x0 = POCZATEK_PRZEDZIALU, xn = KONIEC_PRZEDZIALU;
+  double *l, *d, *u, *b, *x, *blad, x0 = POCZATEK_PRZEDZIALU, xn = POCZATEK_PRZEDZIALU;
   std::fstream numerow, analitycznie;
   numerow.open("wynikiNumerow.txt", std::ios_base::app);
   analitycznie.open("wynikiAnalitycznie.txt", std::ios_base::app);
@@ -167,7 +167,7 @@ double Numerowa(double h, int N) {
  */
 double konwencjonalnaTrzypunktowa(double h, int N) //funkcja realizująca dyskretyzację konwencjonalną trzypunktową
 {
-  double *l, *d, *u, *b, *x, *blad, x0 = POCZATEK_PRZEDZIALU, xn = KONIEC_PRZEDZIALU;
+  double *l, *d, *u, *b, *x, *blad, x0 = POCZATEK_PRZEDZIALU, xn = POCZATEK_PRZEDZIALU;
   std::fstream konwencjonalnie;
   konwencjonalnie.open("wynikiKonwencjonalnie.txt", std::ios_base::app);
   konwencjonalnie << std::scientific;
@@ -228,13 +228,13 @@ int main() //funkcja główna
 
   std::fstream bledy, rzedy;
   bledy.open("bledy.txt", std::fstream::out);
-  bledy << std::scientific; //ustawienie precyzji
+  bledy << std::scientific;
   std::cout.precision(10);
 
-  for (N = 2; N < 100000; N += 100) {
+  for (N = 2; N < 1000000; N += 100) {
     h = (KONIEC_PRZEDZIALU - POCZATEK_PRZEDZIALU) / (N - 1);
-    bladKonw = (konwencjonalnaTrzypunktowa(h, N));
-    bladNum = (Numerowa(h, N));
+    bladKonw = konwencjonalnaTrzypunktowa(h, N);
+    bladNum = Numerowa(h, N);
     bledy << log10(h) << "\t" << log10(bladKonw) << "\t" << log10(bladNum) << "\n";
   }
   bledy.close();
