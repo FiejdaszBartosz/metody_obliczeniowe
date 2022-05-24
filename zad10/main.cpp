@@ -6,15 +6,6 @@
 #include <fstream>
 #include <math.h>
 
-double rozwiazanieAnalityczne(double t); //funkcja do rozwiazywania równania analitycznie
-double bezposredniaEulera(double deltaT,
-                          double tmax); //funkcja do rozwiazywania równania za pomocą metody bezpośredniej Eulera
-double bezposredniaEuleraBlad(double deltaT, int b); //funkcja do obliczania błędu dla metody bezpośredniej Eulera
-double posredniaEulera(double deltaT, double t); //funkcja do rozwiazywania równania za pomocą metody bpośredniej Eulera
-double posredniaEuleraBlad(double deltaT, int ilosc); //funkcja do obliczania błędu dla metody pośredniej Eulera
-double trapezow(double deltaT, double t); //funkcja do rozwiazywania równania za pomocą metody trapezów
-double trapezowBlad(double deltaT, int ilosc); //funkcja do obliczania błędu dla metody trapezów
-
 /**
  * Oblicza rozwiazanie analityczne od argumentu t
  * @param t zmienna t
@@ -180,7 +171,7 @@ int main() {
   int N = 5000000; //maksymalna ilosć iteracji
 
   // Obliczanie bledow z metody
-  h = 0.1;
+  h = 0.05;
   for (h; h > 1e-16; h = h / 2) {
     besWynik = log10(bezposredniaEuleraBlad(h, N)); //stabilna bezpośrednia Eulera
     peWynik = log10(posredniaEuleraBlad(h, N));
@@ -198,8 +189,8 @@ int main() {
     wyniki << t << "\t" << analitycznieWynik << "\t" << peWynik << "\t" << tWynik << "\t" << besWynik << "\n";
   }
 
-  h = 0.15;
-  for (double t = 0; t < 5; t += 0.15) {
+  h = 0.25;
+  for (double t = 0; t < 5; t += 0.25) {
     bensWynik = bezposredniaEulera(h, t); //niestabilna bezpośrednia Eulera
     wyniki2 << t << "\t" << rozwiazanieAnalityczne(t) << "\t" << bensWynik << "\n";
   }
