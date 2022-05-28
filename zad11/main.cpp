@@ -19,7 +19,7 @@ const double X_MAX = A;
 const double X_MIN = -A;
 const double LAMBDA_BEZPOSREDNIE = 0.4;
 const double LAMBDA_POSREDNIE = 1.0;
-const double H = 0.07;
+const double H = 0.1;
 
 /**
  * Tworzy wektor o rozmiarze n
@@ -77,6 +77,22 @@ void zapiszWektor(double *wektor, int n, string nazwa_pliku) {
   if (file.is_open()) {
     for (int i = 0; i < n; i++) {
       file << wektor[i] << endl;
+    }
+  }
+}
+
+/**
+ * Zapisuje podany wektor do pliku
+ * @param wektor
+ * @param n
+ * @param nazwa_pliku
+ */
+void zapiszDwaWektory(double *wektor1, double *wektor2, int n, string nazwa_pliku) {
+  fstream file(nazwa_pliku.c_str(), ios::out);
+
+  if (file.is_open()) {
+    for (int i = 0; i < n; i++) {
+      file << wektor1[i] << "\t" << wektor2[i] << endl;
     }
   }
 }
@@ -574,6 +590,47 @@ int main() {
   zapiszWektor(odstepX, n, "odstepyXLaasonenThomas.csv");
   zapiszWektor(odstepDT, n, "odstepyCzasoweLaasonenJacobi.csv");
 
+  double h = 0.25;
+  int k = 25;
+  double *wykres1_kmb = utworzWektor(k);
+  double *wykres1_LT = utworzWektor(k);
+  double *wykres1_LJ = utworzWektor(k);
+  double *wykres1_kroki = utworzWektor(k);
+
+
+  for (int i = 0; i < k; ++i) {
+    dt = obliczDT(LAMBDA_BEZPOSREDNIE, h, D);
+    n = ((T_MAX - T_MIN) / dt);
+    m = ((X_MAX - X_MIN) / h);
+
+    rozwiazanieAnalityczne = rozwiazAnalitycznie(n, m, h, dt);
+
+    rozwiazanieKmb = kmbRozwiazanie(n, m);
+    macierzBledy = obliczBlad(rozwiazanieAnalityczne, rozwiazanieKmb, n, m);
+    wektorBledy = maxBlad(macierzBledy, n, m);
+    wykres1_kmb[i] = log10(fabs(wektorBledy[n - 1]));
+
+    dt = obliczDT(LAMBDA_POSREDNIE, h, D);
+    n = ((T_MAX - T_MIN) / dt);
+
+    rozwiazanieLaasonenThomas = mlThomasRozwiazanie(n, m);
+    macierzBledy = obliczBlad(rozwiazanieAnalityczne, rozwiazanieLaasonenThomas, n, m);
+    wektorBledy = maxBlad(macierzBledy, n, m);
+    wykres1_LT[i] = log10(fabs(wektorBledy[n - 1]));
+
+    rozwiazanieLaasonenJacobi = mlJacobiRozwiazanie(n, m);
+    macierzBledy = obliczBlad(rozwiazanieAnalityczne, rozwiazanieLaasonenJacobi, n, m);
+    wektorBledy = maxBlad(macierzBledy, n, m);
+    wykres1_LJ[i] = log10(fabs(wektorBledy[n - 1]));
+
+    wykres1_kroki[i] = log10(h);
+    h = h / 1.05;
+  }
+
+  zapiszDwaWektory( wykres1_kroki, wykres1_kmb, k, "wykres1_1.csv");
+  zapiszDwaWektory(wykres1_kroki, wykres1_LT, k, "wykres1_2.csv");
+  zapiszDwaWektory(wykres1_kroki, wykres1_LJ, k, "wykres1_3.csv");
+
   usunMacierz(rozwiazanieAnalityczne, n);
   usunMacierz(rozwiazanieLaasonenThomas, n);
   usunMacierz(rozwiazanieLaasonenJacobi, n);
@@ -581,6 +638,10 @@ int main() {
   usunWektor(wektorBledy);
   usunWektor(odstepX);
   usunWektor(odstepDT);
+  usunWektor(wykres1_kmb);
+  usunWektor(wykres1_LT);
+  usunWektor(wykres1_LJ);
+  usunWektor(wykres1_kroki);
 
   return 0;
 }
