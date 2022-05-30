@@ -21,6 +21,8 @@ const double LAMBDA_BEZPOSREDNIE = 0.4;
 const double LAMBDA_POSREDNIE = 1.0;
 const double H = 0.1;
 
+# define wykres1
+
 /**
  * Tworzy wektor o rozmiarze n
  * @param n rozmiar wektora
@@ -562,6 +564,7 @@ int main() {
   // Metoda Posrednia Laasonem + Algorytm Thomasa
   dt = obliczDT(LAMBDA_POSREDNIE, H, D);
   n = ((T_MAX - T_MIN) / dt);
+  m = ((X_MAX - X_MIN) / H);
 
   rozwiazanieLaasonenThomas = mlThomasRozwiazanie(n, m);
   zapiszMacierz(rozwiazanieLaasonenThomas, n, m, "laasonenThomasRozwiazanie.csv");
@@ -577,6 +580,9 @@ int main() {
   zapiszWektor(odstepDT, n, "odstepyCzasoweLaasonenThomas.csv");
 
   // Metoda Posrednia Laasonem + Metoda Iteracyjna Jacobiego
+  dt = obliczDT(LAMBDA_POSREDNIE, H, D);
+  n = ((T_MAX - T_MIN) / dt);
+  m = ((X_MAX - X_MIN) / H);
   rozwiazanieLaasonenJacobi = mlJacobiRozwiazanie(n, m);
   zapiszMacierz(rozwiazanieLaasonenThomas, n, m, "laasonenJacobiRozwiazanie.csv");
 
@@ -590,15 +596,17 @@ int main() {
   zapiszWektor(odstepX, n, "odstepyXLaasonenThomas.csv");
   zapiszWektor(odstepDT, n, "odstepyCzasoweLaasonenJacobi.csv");
 
-  double h = 0.25;
-  int k = 25;
+#ifdef wykres1
+  double h, deltaT, maxErr;
+  int k = 1000, j = 0;
   double *wykres1_kmb = utworzWektor(k);
   double *wykres1_LT = utworzWektor(k);
   double *wykres1_LJ = utworzWektor(k);
   double *wykres1_kroki = utworzWektor(k);
 
 
-  for (int i = 0; i < k; ++i) {
+  for (int i = 40; i < 400; i += 40) {
+    h = (X_MAX - X_MIN) / i;
     dt = obliczDT(LAMBDA_BEZPOSREDNIE, h, D);
     n = ((T_MAX - T_MIN) / dt);
     m = ((X_MAX - X_MIN) / h);
@@ -608,7 +616,7 @@ int main() {
     rozwiazanieKmb = kmbRozwiazanie(n, m);
     macierzBledy = obliczBlad(rozwiazanieAnalityczne, rozwiazanieKmb, n, m);
     wektorBledy = maxBlad(macierzBledy, n, m);
-    wykres1_kmb[i] = log10(fabs(wektorBledy[n - 1]));
+    wykres1_kmb[j] = log10(fabs(normaMax(wektorBledy, n)));
 
     dt = obliczDT(LAMBDA_POSREDNIE, h, D);
     n = ((T_MAX - T_MIN) / dt);
@@ -616,20 +624,21 @@ int main() {
     rozwiazanieLaasonenThomas = mlThomasRozwiazanie(n, m);
     macierzBledy = obliczBlad(rozwiazanieAnalityczne, rozwiazanieLaasonenThomas, n, m);
     wektorBledy = maxBlad(macierzBledy, n, m);
-    wykres1_LT[i] = log10(fabs(wektorBledy[n - 1]));
+    wykres1_LT[j] = log10(fabs(wektorBledy[n - 1]));
 
     rozwiazanieLaasonenJacobi = mlJacobiRozwiazanie(n, m);
     macierzBledy = obliczBlad(rozwiazanieAnalityczne, rozwiazanieLaasonenJacobi, n, m);
     wektorBledy = maxBlad(macierzBledy, n, m);
-    wykres1_LJ[i] = log10(fabs(wektorBledy[n - 1]));
+    wykres1_LJ[j] = log10(fabs(wektorBledy[n - 1]));
 
-    wykres1_kroki[i] = log10(h);
-    h = h / 1.05;
+    wykres1_kroki[j] = log10(h);
+    j++;
   }
 
   zapiszDwaWektory( wykres1_kroki, wykres1_kmb, k, "wykres1_1.csv");
   zapiszDwaWektory(wykres1_kroki, wykres1_LT, k, "wykres1_2.csv");
   zapiszDwaWektory(wykres1_kroki, wykres1_LJ, k, "wykres1_3.csv");
+#endif
 
   usunMacierz(rozwiazanieAnalityczne, n);
   usunMacierz(rozwiazanieLaasonenThomas, n);
@@ -638,10 +647,12 @@ int main() {
   usunWektor(wektorBledy);
   usunWektor(odstepX);
   usunWektor(odstepDT);
+
+#ifdef wykres1
   usunWektor(wykres1_kmb);
   usunWektor(wykres1_LT);
   usunWektor(wykres1_LJ);
   usunWektor(wykres1_kroki);
-
+#endif
   return 0;
 }
