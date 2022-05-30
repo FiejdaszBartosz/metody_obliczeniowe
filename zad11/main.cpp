@@ -11,6 +11,8 @@
 
 using namespace std;
 
+#define wykres1
+
 const int D = 1;
 const double T_MIN = 0.0;
 const double T_MAX = 2.0;
@@ -20,8 +22,6 @@ const double X_MIN = -A;
 const double LAMBDA_BEZPOSREDNIE = 0.4;
 const double LAMBDA_POSREDNIE = 1.0;
 const double H = 0.1;
-
-# define wykres1
 
 /**
  * Tworzy wektor o rozmiarze n
@@ -377,9 +377,9 @@ void jacobi(double **macierz, double *b, double *x, int n, int m) {
 
 /**
  * Implementacja metody Laasonem, rozwiazanie algebraiczne przy pomocy metody jacobiego
- * @param macierz
- * @param n
- * @param m
+ * @param macierz macierz
+ * @param n rozmiar n
+ * @param m rozmiar m
  */
 void mlJacobi(double **macierz, int n, int m) {
   double tempLabda = 1.0 + 2.0 * LAMBDA_POSREDNIE;
@@ -530,6 +530,22 @@ double *obliczOdstepyDT(double dt, int n, int m) {
   return wynik;
 }
 
+/**
+ * Zapisanie rozwiazania w 2 kolomnach krok i rozwiazanie uzywam do stowrzenia wykresow do zadania 2
+ * @param macierz rozwiazanie
+ * @param wektorKroki kroki
+ * @param rozmiar rozmiar
+ * @param pozycja dana pozycja
+ * @param nazwaPliku nazwa pliku
+ */
+void zapiszRozwiazanie_zad2(double **macierz, double *wektorKroki, int rozmiar, int pozycja, string nazwaPliku) {
+  double *temp = utworzWektor(rozmiar);
+  for (int i = 0; i < rozmiar; ++i) {
+    temp[i] = macierz[pozycja][i];
+  }
+  zapiszDwaWektory(wektorKroki, temp, rozmiar, nazwaPliku);
+}
+
 int main() {
   double dt = obliczDT(LAMBDA_BEZPOSREDNIE, H, D);
   int n = ((T_MAX - T_MIN) / dt);
@@ -561,6 +577,9 @@ int main() {
   zapiszWektor(odstepDT, n, "odstepyCzasoweKmb.csv");
   zapiszWektor(odstepX, n, "odstepyXKmb.csv");
 
+  zapiszRozwiazanie_zad2(rozwiazanieKmb, odstepX, m, 84, "1rozKMB.csv");
+  zapiszRozwiazanie_zad2(rozwiazanieAnalityczne, odstepX, m, 84, "1rozAnalityczne.csv");
+
   // Metoda Posrednia Laasonem + Algorytm Thomasa
   dt = obliczDT(LAMBDA_POSREDNIE, H, D);
   n = ((T_MAX - T_MIN) / dt);
@@ -579,12 +598,14 @@ int main() {
   zapiszWektor(odstepX, n, "odstepyXLaasonenThomas.csv");
   zapiszWektor(odstepDT, n, "odstepyCzasoweLaasonenThomas.csv");
 
+  zapiszRozwiazanie_zad2(rozwiazanieLaasonenThomas, odstepX, m, 84, "1rozLT.csv");
+
   // Metoda Posrednia Laasonem + Metoda Iteracyjna Jacobiego
   dt = obliczDT(LAMBDA_POSREDNIE, H, D);
   n = ((T_MAX - T_MIN) / dt);
   m = ((X_MAX - X_MIN) / H);
   rozwiazanieLaasonenJacobi = mlJacobiRozwiazanie(n, m);
-  zapiszMacierz(rozwiazanieLaasonenThomas, n, m, "laasonenJacobiRozwiazanie.csv");
+  zapiszMacierz(rozwiazanieLaasonenJacobi, n, m, "laasonenJacobiRozwiazanie.csv");
 
   macierzBledy = obliczBlad(rozwiazanieAnalityczne, rozwiazanieLaasonenJacobi, n, m);
   wektorBledy = maxBlad(macierzBledy, n, m);
@@ -596,17 +617,18 @@ int main() {
   zapiszWektor(odstepX, n, "odstepyXLaasonenThomas.csv");
   zapiszWektor(odstepDT, n, "odstepyCzasoweLaasonenJacobi.csv");
 
+  zapiszRozwiazanie_zad2(rozwiazanieLaasonenJacobi, odstepX, m, 84, "1rozLJ.csv");
+
 #ifdef wykres1
-  double h, deltaT, maxErr;
-  int k = 1000, j = 0;
+  double h = 0.225;
+  int k = 150;
   double *wykres1_kmb = utworzWektor(k);
   double *wykres1_LT = utworzWektor(k);
   double *wykres1_LJ = utworzWektor(k);
   double *wykres1_kroki = utworzWektor(k);
 
 
-  for (int i = 40; i < 400; i += 40) {
-    h = (X_MAX - X_MIN) / i;
+  for (int i = 0; i < k; ++i) {
     dt = obliczDT(LAMBDA_BEZPOSREDNIE, h, D);
     n = ((T_MAX - T_MIN) / dt);
     m = ((X_MAX - X_MIN) / h);
@@ -616,7 +638,7 @@ int main() {
     rozwiazanieKmb = kmbRozwiazanie(n, m);
     macierzBledy = obliczBlad(rozwiazanieAnalityczne, rozwiazanieKmb, n, m);
     wektorBledy = maxBlad(macierzBledy, n, m);
-    wykres1_kmb[j] = log10(fabs(normaMax(wektorBledy, n)));
+    wykres1_kmb[i] = log10(fabs(wektorBledy[n - 1]));
 
     dt = obliczDT(LAMBDA_POSREDNIE, h, D);
     n = ((T_MAX - T_MIN) / dt);
@@ -624,15 +646,15 @@ int main() {
     rozwiazanieLaasonenThomas = mlThomasRozwiazanie(n, m);
     macierzBledy = obliczBlad(rozwiazanieAnalityczne, rozwiazanieLaasonenThomas, n, m);
     wektorBledy = maxBlad(macierzBledy, n, m);
-    wykres1_LT[j] = log10(fabs(wektorBledy[n - 1]));
+    wykres1_LT[i] = log10(fabs(wektorBledy[n - 1]));
 
     rozwiazanieLaasonenJacobi = mlJacobiRozwiazanie(n, m);
     macierzBledy = obliczBlad(rozwiazanieAnalityczne, rozwiazanieLaasonenJacobi, n, m);
     wektorBledy = maxBlad(macierzBledy, n, m);
-    wykres1_LJ[j] = log10(fabs(wektorBledy[n - 1]));
+    wykres1_LJ[i] = log10(fabs(wektorBledy[n - 1]));
 
-    wykres1_kroki[j] = log10(h);
-    j++;
+    wykres1_kroki[i] = log10(h);
+    h = h / 1.008;
   }
 
   zapiszDwaWektory( wykres1_kroki, wykres1_kmb, k, "wykres1_1.csv");
